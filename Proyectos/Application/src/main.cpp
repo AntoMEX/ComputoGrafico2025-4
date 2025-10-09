@@ -1,7 +1,7 @@
 #include "glad.h"
 #include <GLFW/glfw3.h>
 #include "Application.h"
-
+#include "ShaderFuncs.h"
 
 int main(void)
 {
@@ -35,6 +35,11 @@ int main(void)
     app.setup();
 
     //Termina la etapa de setup
+    
+    //prueba de lectura de archivo de texto y convertirlo en texto, función en ShaderFuncs
+    /*std::string contenido = leerArchivo("datos.txt");
+
+    std::cout << "Contenido del archivo:\n" << contenido << std::endl;*/
 
     /* Loop until the user closes the window */
     while (!glfwWindowShouldClose(window))
@@ -42,15 +47,15 @@ int main(void)
         /* Render here */
         glClear(GL_COLOR_BUFFER_BIT);
 
-        /* Swap front and back buffers */
-        glfwSwapBuffers(window);
-
         /* Poll for and process events */
         glfwPollEvents();
 
         app.update();
 
         app.draw();
+
+        /* Swap front and back buffers */
+        glfwSwapBuffers(window);
     }
 
     glfwTerminate();

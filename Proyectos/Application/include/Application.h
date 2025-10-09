@@ -1,6 +1,7 @@
 #pragma once
 #include <vector>
 #include <map>
+#include <iostream>
 #include "glad.h"
 
 class Application 
@@ -16,6 +17,9 @@ private:
 	std::map<std::string, GLuint> ids;//izquierda llave y derecha valor
 
 public:
+
+	void setupGeometry();
+	void setupProgram();
 
 	void setup();
 	void update();

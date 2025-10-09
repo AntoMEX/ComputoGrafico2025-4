@@ -1,0 +1,8 @@
+#version 460 core //Versión 4.60 de OpenGL
+
+out vec4 outColor; //A la salida del Fragment Shader da un color
+
+void main()
+{
+	outColor = vec4(1.0f, 0.0f, 0.0f, 1.0f); //RGBA, saldrá color rojo
+}
