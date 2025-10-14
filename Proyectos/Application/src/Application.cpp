@@ -29,9 +29,6 @@ void Application::setupGeometry()
 	glVertexAttribPointer(1, 4, GL_FLOAT, GL_FALSE, 0, (const void*)(16*sizeof(float))); //segundo indice, tamaño (vertices de 4 valores), cada uno flotante, 
 	glEnableVertexAttribArray(1);                          //datos no normales porque son vertices, cuantos bytes deben pasar 
 														   //para encontrar el siguiente vertice y desde el 0 va el primer valor
-
-
-	//d::cout << "setup()" << std::endl;
 }
 
 void Application::setupProgram()
@@ -41,25 +38,74 @@ void Application::setupProgram()
 
 	ids["Programa"] = InitializeProgram(vertexShader, fragmentShader); //Guardar en el mapa el id del mapa
 
-	ids["Time"] = glGetUniformLocation(ids["Programa"], "Time");
+	ids["Time"] = glGetUniformLocation(ids["Programa"], "time");
+
+	ids["DirX"] = glGetUniformLocation(ids["Programa"], "dirX");
+}
+
+//void Application::setupProgram1()
+//{
+//	std::string vertexShader = leerArchivo("Shaders/VertexShader.glsl");
+//	std::string fragmentShader = leerArchivo("Shaders/FragmentShader.glsl"); //Lee el archivo y lo guarda en texto
+//
+//	ids["Programa1"] = InitializeProgram(vertexShader, fragmentShader); //Guardar en el mapa el id del mapa
+//
+//	ids["Time"] = glGetUniformLocation(ids["Programa"], "time");
+//
+//	ids["DirX"] = glGetUniformLocation(ids["Programa"], "dirX");
+//}
+//
+//void Application::setupProgram2()
+//{
+//	std::string vertexShader = leerArchivo("Shaders/VertexShader.glsl");
+//	std::string fragmentShader = leerArchivo("Shaders/FragmentShader.glsl"); //Lee el archivo y lo guarda en texto
+//
+//	ids["Programa2"] = InitializeProgram(vertexShader, fragmentShader); //Guardar en el mapa el id del mapa
+//
+//	ids["Time"] = glGetUniformLocation(ids["Programa"], "time");
+//
+//	ids["DirX"] = glGetUniformLocation(ids["Programa"], "dirX");
+//}
+
+void Application::keyCallback(int key, int scancode, int action, int mods) 
+{
+	if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS)
+	{
+		glfwSetWindowShouldClose(window, true);
+	}
+	if (key == GLFW_KEY_A && action == GLFW_PRESS) 
+	{
+		dirX -= 0.05f; 
+	}
+	if (key == GLFW_KEY_D && action == GLFW_PRESS)
+	{
+		dirX += 0.05f; 
+	}
 }
 
 void Application::setup()
 {
 	setupGeometry();
 	setupProgram();
+	/*setupProgram1();
+	setupProgram2();*/
 }
 
 void Application::update() 
 {
 	time += 0.001f;
+	camera = glm::lookAt(eye, center, glm::vec3(0.0f, 1.0f, 0.0f));
 }
 
 void Application::draw() 
 {
 	glUseProgram(ids["Programa"]);
 
+	//glUseProgram(ids["Programa1"]);
+
 	glUniform1f(ids["Time"], time);
+
+	glUniform1f(ids["DirX"], dirX);
 
 	glBindVertexArray(ids["Triangle"]);
 

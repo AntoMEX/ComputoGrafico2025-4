@@ -3,33 +3,32 @@
 #include "Application.h"
 #include "ShaderFuncs.h"
 
+Application app;
+
 //Función callback para input
 void input(GLFWwindow* window, int key, int scancode, int action, int mods) 
 {
-    if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
-        glfwSetWindowShouldClose(window, true);
+    app.keyCallback(key, scancode, action, mods);
 }
 
 int main(void)
 {
     //Etapa de setup
-    GLFWwindow* window; //Inicializa la ventana
-    Application app;
 
     /* Initialize the library */
     if (!glfwInit())
         return -1;
 
     /* Create a windowed mode window and its OpenGL context */
-    window = glfwCreateWindow(1080, 720, "Hello Application", NULL, NULL);
-    if (!window) //Si falla
+    app.window = glfwCreateWindow(1080, 720, "Hello Application", NULL, NULL);
+    if (!app.window) //Si falla
     {
         glfwTerminate();
         return -1;
     }
 
     /* Make the window's context current */
-    glfwMakeContextCurrent(window); //Ligar Windows con openGL
+    glfwMakeContextCurrent(app.window); //Ligar Windows con openGL
 
     if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)) 
     {
@@ -39,7 +38,7 @@ int main(void)
         return -1;
     }
 
-    glfwSetKeyCallback(window, input);
+    glfwSetKeyCallback(app.window, input);
 
     app.setup();
 
@@ -51,7 +50,7 @@ int main(void)
     std::cout << "Contenido del archivo:\n" << contenido << std::endl;*/
 
     /* Loop until the user closes the window */
-    while (!glfwWindowShouldClose(window))
+    while (!glfwWindowShouldClose(app.window))
     {
         /* Render here */
         glClear(GL_COLOR_BUFFER_BIT);
@@ -64,7 +63,7 @@ int main(void)
         app.draw();
 
         /* Swap front and back buffers */
-        glfwSwapBuffers(window);
+        glfwSwapBuffers(app.window);
     }
 
     glfwTerminate();
