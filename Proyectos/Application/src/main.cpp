@@ -3,6 +3,13 @@
 #include "Application.h"
 #include "ShaderFuncs.h"
 
+//Función callback para input
+void input(GLFWwindow* window, int key, int scancode, int action, int mods) 
+{
+    if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
+        glfwSetWindowShouldClose(window, true);
+}
+
 int main(void)
 {
     //Etapa de setup
@@ -31,6 +38,8 @@ int main(void)
         //de las funciones de OpenGL, que es lo que GLAD necesita para cargar
         return -1;
     }
+
+    glfwSetKeyCallback(window, input);
 
     app.setup();
 
