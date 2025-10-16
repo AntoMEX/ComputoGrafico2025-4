@@ -7,15 +7,14 @@ layout (location = 1) in vec4 vColor; //Abre canal de comunicación con el exteri
 //vColor de color
 out vec4 vertexColor; //Sale de vertexshader
 uniform float time; //Sirven para comunicar con C++
-
-uniform float dirX;
+uniform mat4 camera;
+uniform mat4 projection;
+uniform mat4 model;
 
 void main()
 {
 	vertexColor = vColor; //El vertexColor es los colores del vColor
-	vec4 newPos = vPosition;
-
-	newPos.x += dirX + cos(time);
+	vec4 newPos = projection * camera * model * vPosition;
 
 	gl_Position = newPos; //Posicion del vertice
 }
