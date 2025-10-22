@@ -40,6 +40,18 @@ int main(void)
 
     glfwSetKeyCallback(app.window, input);
 
+    glfwSetCursorPosCallback(app.window, [](GLFWwindow* window, double xpos, double ypos) 
+        {
+        app.cursorPositionCallback(window, xpos, ypos);
+        }
+    );
+
+    glfwSetScrollCallback(app.window, [](GLFWwindow* window, double xoffset, double yoffset) 
+        {
+        app.scrollCallback(window, xoffset, yoffset);
+        }
+    );
+
     app.setup();
 
     //Termina la etapa de setup

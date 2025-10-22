@@ -14,6 +14,14 @@ private:
 
 	float dirX = 0.0f;
 
+    double lastX = 540.0, lastY = 360.0; // centro inicial de la ventana
+    bool firstMouse = true;
+    float yaw = 0.0f;   // rotación horizontal (eje Y)
+    float pitch = 0.0f; // rotación vertical (eje X)
+    float zoom = 1.0f;  // escala con scroll
+
+    bool curP = true, curG = true;
+
 	std::vector<float> geometry
 	{   //Vertices
 		// x     y     z     w
@@ -136,7 +144,7 @@ private:
     glm::mat4 projection;
     glm::mat4 model;
 	glm::vec3 eye{ 0.0f, 0.0f, 2.0f };
-	glm::vec3 center{ 1.0f, 0.5f, 0.0f };
+	glm::vec3 center{ 0.0f, 0.0f, 0.0f };
 
 public:
 
@@ -145,9 +153,7 @@ public:
 	void setupGeometry();
 	void setupProgram();
 
-	//void setupProgram1();
 	void setupProgram2();
-
 	void setupCube();
 
 	void setup();
@@ -156,4 +162,13 @@ public:
 
 	void keyCallback(int key, int scancode, int action, int mods);
 
+    void cursorPositionCallback(GLFWwindow* window, double xpos, double ypos);
+
+    void scrollCallback(GLFWwindow* window, double xoffset, double yoffset);
+
+    void currentProgram();
+
+    void currentGeometry();
+
+    void cameraAndMove();
 };

@@ -10,6 +10,10 @@ uniform float time; //Sirven para comunicar con C++
 
 uniform float dirX;
 
+uniform mat4 camera;
+uniform mat4 projection;
+uniform mat4 model;
+
 void main()
 {
 	vertexColor = vColor; //El vertexColor es los colores del vColor
