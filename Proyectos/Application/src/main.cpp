@@ -20,7 +20,7 @@ int main(void)
         return -1;
 
     /* Create a windowed mode window and its OpenGL context */
-    app.window = glfwCreateWindow(1080, 720, "Hello Application", NULL, NULL);
+    app.window = glfwCreateWindow(1080, 720, "Programa de OpenGL", NULL, NULL);
     if (!app.window) //Si falla
     {
         glfwTerminate();

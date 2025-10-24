@@ -14,13 +14,21 @@ private:
 
 	float dirX = 0.0f;
 
-    double lastX = 540.0, lastY = 360.0; // centro inicial de la ventana
+    double lastX = 540.0, lastY = 360.0;
     bool firstMouse = true;
-    float yaw = 0.0f;   // rotación horizontal (eje Y)
-    float pitch = 0.0f; // rotación vertical (eje X)
-    float zoom = 1.0f;  // escala con scroll
+    float yaw = 0.0f; //Rotación horizontal (eje Y)
+    float pitch = 0.0f; //Rotación vertical (eje X)
+    float zoom = 1.0f; //Escala con scroll
 
-    bool curP = true, curG = true;
+    //Indices actuales
+    int currentProgram = 0;
+    int currentGeometry = 0;
+
+    //Arreglos de programas y geometrías
+    GLuint programs[2];
+    GLuint vaos[2];
+    GLenum modes[2];
+    GLsizei counts[2];
 
 	std::vector<float> geometry
 	{   //Vertices
@@ -166,9 +174,4 @@ public:
 
     void scrollCallback(GLFWwindow* window, double xoffset, double yoffset);
 
-    void currentProgram();
-
-    void currentGeometry();
-
-    void cameraAndMove();
 };

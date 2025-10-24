@@ -98,21 +98,13 @@ void Application::keyCallback(int key, int scancode, int action, int mods)
 		dirX += 0.05f; 
 	}
 
-	if (key == GLFW_KEY_1 && action == GLFW_PRESS) 
+	if (key == GLFW_KEY_P && action == GLFW_PRESS) 
 	{
-		curP = true;
+		currentProgram = (currentProgram + 1) % 2; //Alternar entre pos de arreglo 0 y 1
 	}
-	if (key == GLFW_KEY_2 && action == GLFW_PRESS) 
+	if (key == GLFW_KEY_G && action == GLFW_PRESS) 
 	{
-		curP = false;
-	}
-	if (key == GLFW_KEY_T && action == GLFW_PRESS)
-	{
-		curG = true;
-	}
-	if (key == GLFW_KEY_C && action == GLFW_PRESS)
-	{
-		curG = false;
+		currentGeometry = (currentGeometry + 1) % 2; //Alternar entre pos de arreglo 0 y 1
 	}
 }
 //Cursor
@@ -140,48 +132,9 @@ void Application::cursorPositionCallback(GLFWwindow* window, double xpos, double
 //Scroll
 void Application::scrollCallback(GLFWwindow* window, double xoffset, double yoffset)
 {
-	zoom += (float)yoffset * 0.1f; //cada paso de scroll cambia la escala
+	zoom += (float)yoffset * 0.1f; //Cada paso de scroll cambia la escala
 	if (zoom < 0.1f) zoom = 0.1f;
 	if (zoom > 3.0f) zoom = 3.0f;
-}
-
-//Programa actual
-void Application::currentProgram()
-{
-	if (curP == true)
-	{
-		glUseProgram(ids["Programa"]);
-	}
-	if (curP == false)
-	{
-		glUseProgram(ids["Programa2"]);
-	}
-}
-//Geometria actual
-void Application::currentGeometry()
-{
-	if (curG == true)
-	{
-		glBindVertexArray(ids["Triangle"]);
-		glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
-	}
-	if (curG == false)
-	{
-		glBindVertexArray(ids["Cube"]);
-		glDrawArrays(GL_TRIANGLES, 0, 36);
-	}
-}
-//Datos extra para movimiento y cámara
-void Application::cameraAndMove()
-{
-	glUniform1f(ids["Time"], time);
-	glUniform1f(ids["Time2"], time);
-
-	glUniformMatrix4fv(ids["Model"], 1, GL_FALSE, &model[0][0]);
-	glUniformMatrix4fv(ids["Camera"], 1, GL_FALSE, &camera[0][0]);
-	glUniformMatrix4fv(ids["Projection"], 1, GL_FALSE, &projection[0][0]);
-
-	glUniform1f(ids["DirX"], dirX);
 }
 //Setup de todo
 void Application::setup()
@@ -190,6 +143,20 @@ void Application::setup()
 	setupCube();
 	setupProgram();
 	setupProgram2();
+
+	//Programas
+	programs[0] = ids["Programa"];
+	programs[1] = ids["Programa2"];
+	//Geometrías
+	//Triangulo o más bien cuadrado con TRIANGLE_STRIP
+	vaos[0] = ids["Triangle"];
+	modes[0] = GL_TRIANGLE_STRIP;
+	counts[0] = 4;
+	//Cubo
+	vaos[1] = ids["Cube"];
+	modes[1] = GL_TRIANGLES;
+	counts[1] = 36;
+
 	projection = glm::perspective(45.0f, 1080.0f / 720.0f, 0.1f, 100.0f);
 	glEnable(GL_DEPTH_TEST);
 }
@@ -214,7 +181,18 @@ void Application::update()
 //Dibujado de todo
 void Application::draw() 
 {
-	currentProgram();
-	cameraAndMove();
-	currentGeometry();
+	//Programa actual
+	glUseProgram(programs[currentProgram]);
+
+	//Datos extra para movimiento y cámara
+	glUniform1f(ids["Time"], time);
+	glUniform1f(ids["Time2"], time);
+	glUniformMatrix4fv(ids["Model"], 1, GL_FALSE, &model[0][0]);
+	glUniformMatrix4fv(ids["Camera"], 1, GL_FALSE, &camera[0][0]);
+	glUniformMatrix4fv(ids["Projection"], 1, GL_FALSE, &projection[0][0]);
+	glUniform1f(ids["DirX"], dirX);
+
+	//Geometria actual
+	glBindVertexArray(vaos[currentGeometry]);
+	glDrawArrays(modes[currentGeometry], 0, counts[currentGeometry]);
 }
