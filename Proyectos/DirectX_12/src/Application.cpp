@@ -44,8 +44,6 @@ void Application::setupGeometry()
 		0.0f, 1.0f, 0.0f, 1.0f,   //verde
 		 0.0f, 0.0f, 1.0f, 1.0f   //azul
 	};
-
-	
 }
 
 void Application::keyCallback(int key, int scancode, int action, int mods)
@@ -56,15 +54,50 @@ void Application::keyCallback(int key, int scancode, int action, int mods)
 	//teclas para mover	
 }
 
+void Application::setupDepthBuffer()
+{
+	D3D12_DESCRIPTOR_HEAP_DESC dsvHeapDesc = {};
+	dsvHeapDesc.NumDescriptors = 1;
+	dsvHeapDesc.Type = D3D12_DESCRIPTOR_HEAP_TYPE_DSV;
+	dsvHeapDesc.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_NONE;
+	ThrowIfFailed(g_device->CreateDescriptorHeap(&dsvHeapDesc, IID_PPV_ARGS(&g_dsvHeap)), "Error creando DSV heap");
+
+	D3D12_RESOURCE_DESC depthDesc = {};
+	depthDesc.Dimension = D3D12_RESOURCE_DIMENSION_TEXTURE2D;
+	depthDesc.Width = WINDOW_WIDTH;
+	depthDesc.Height = WINDOW_HEIGHT;
+	depthDesc.DepthOrArraySize = 1;
+	depthDesc.MipLevels = 1;
+	depthDesc.Format = DXGI_FORMAT_D32_FLOAT;
+	depthDesc.SampleDesc.Count = 1;
+	depthDesc.Layout = D3D12_TEXTURE_LAYOUT_UNKNOWN;
+	depthDesc.Flags = D3D12_RESOURCE_FLAG_ALLOW_DEPTH_STENCIL;
+
+	D3D12_CLEAR_VALUE clearValue = {};
+	clearValue.Format = DXGI_FORMAT_D32_FLOAT;
+	clearValue.DepthStencil.Depth = 1.0f;
+	clearValue.DepthStencil.Stencil = 0;
+
+	D3D12_HEAP_PROPERTIES heapProps = {};
+	heapProps.Type = D3D12_HEAP_TYPE_DEFAULT;
+	heapProps.CPUPageProperty = D3D12_CPU_PAGE_PROPERTY_UNKNOWN;
+	heapProps.MemoryPoolPreference = D3D12_MEMORY_POOL_UNKNOWN;
+	heapProps.CreationNodeMask = 1;
+	heapProps.VisibleNodeMask = 1;
+
+	ThrowIfFailed(g_device->CreateCommittedResource(&heapProps, D3D12_HEAP_FLAG_NONE, &depthDesc,
+			D3D12_RESOURCE_STATE_DEPTH_WRITE, &clearValue, IID_PPV_ARGS(&g_depthStencil)), "Error creando Depth Buffer");
+
+	D3D12_DEPTH_STENCIL_VIEW_DESC dsvDesc = {};
+	dsvDesc.Format = DXGI_FORMAT_D32_FLOAT;
+	dsvDesc.ViewDimension = D3D12_DSV_DIMENSION_TEXTURE2D;
+	dsvDesc.Flags = D3D12_DSV_FLAG_NONE;
+
+	g_device->CreateDepthStencilView(g_depthStencil.Get(), &dsvDesc, g_dsvHeap->GetCPUDescriptorHandleForHeapStart());
+}
+
 void Application::setupShaders()
 {
-	//Microsoft::WRL::ComPtr<ID3DBlob> errorBlob;
-	//const std::string vertexShaderSource = readFile("Shaders/VertexShader.hlsl");
-	//const std::string pixelShaderSource = readFile("Shaders/PixelShader.hlsl");
-	//DirectX:D3DCompile(pixelShaderSource.c_str(), pixelShaderSource.length(), nullptr, 
-	//nullptr, nullptr, "main", 
-	//"ps_5_0", D3DCOMPILE_ENABLE_STRICTNESS, 0, 
-	//vertexShader, &errorBlob);
 }
 
 void Application::setupDevice()
@@ -156,7 +189,7 @@ void Application::setupCommandList()
 	), "Error creando Command Queue");
 	g_commandList->Close(); // La lista debe estar cerrada para el primer reset.	
 }
-
+//Esto no para limpiar pantalla
 void Application::clearColorBuffer(const float& r, const float& g, const float& b, const float& a)
 {
 	// Obtener el handle al RTV actual
@@ -169,12 +202,10 @@ void Application::clearColorBuffer(const float& r, const float& g, const float& 
 	// 5. ¡El Clear! (ID3D12GraphicsCommandList::ClearRenderTargetView)
 	const float clearColor[] = { r, g, b, a };
 	g_commandList->ClearRenderTargetView(rtvHandle, clearColor, 0, nullptr);
-	
 }
 
 void Application::setup()
 {
-
 	setupGeometry();
 	//Inicializa DirectX 12
 	// Crear el DXGI Factory		
@@ -184,6 +215,9 @@ void Application::setup()
 	setupSwapChain();
 	setupDescriptorHeap();
 	setupRenderTargetView();
+
+	setupDepthBuffer();
+
 	setupCommandAllocator();
 	setupCommandList();
 	setupShaders();
@@ -216,8 +250,23 @@ void Application::draw()
 	// Transición del Back Buffer: Present -> Render Target
 	swapBuffers();
 	
+	//RTV y DSV actuales ---
+	D3D12_CPU_DESCRIPTOR_HANDLE rtvHandle = g_rtvHeap->GetCPUDescriptorHandleForHeapStart();
+	rtvHandle.ptr += (SIZE_T)g_frameIndex * g_rtvDescriptorSize;
+	D3D12_CPU_DESCRIPTOR_HANDLE dsvHandle = g_dsvHeap->GetCPUDescriptorHandleForHeapStart();
+
+	//Asignar RTV + DSV
+	g_commandList->OMSetRenderTargets(1, &rtvHandle, FALSE, &dsvHandle);
+
+	//Limpiar color
+	const float clearColor[] = { 1.0f, 1.0f, 1.0f, 1.0f };
+	g_commandList->ClearRenderTargetView(rtvHandle, clearColor, 0, nullptr);
+
+	//Limpiar depth
+	g_commandList->ClearDepthStencilView(dsvHandle, D3D12_CLEAR_FLAG_DEPTH, 1.0f, 0, 0, nullptr);
+
 	//Borrar el buffer
-	clearColorBuffer(1.0f, 1.0f, 1.0f, 1.0f);
+	//clearColorBuffer(1.0f, 1.0f, 1.0f, 1.0f);
 	
 	//render !!
 	//Agrega aqui tus comandos
@@ -233,7 +282,4 @@ void Application::draw()
 	// 8. Presentar el frame y actualizar el índice
 	ThrowIfFailed(g_swapChain->Present(1, 0), "Error al renderizar el cuadro"); // Sincronizado con VSync (1)
 	g_frameIndex = g_swapChain->GetCurrentBackBufferIndex();
-
-	 
-
 }

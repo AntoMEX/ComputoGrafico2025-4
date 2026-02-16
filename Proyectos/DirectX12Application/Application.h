@@ -26,20 +26,20 @@
 
 
 class Application
-{	
+{
 private:
-	void ThrowIfFailed(HRESULT hr, const std::string& msg);
-	void ThrowIfFailed(HRESULT hr);
-	void setupGeometry();
-	void setupShaders();
-	void setupDevice();
-	void setupCommandQueue();
-	void setupSwapChain();
-	void setupDescriptorHeap();
-	void setupRenderTargetView();
-	void setupCommandAllocator();
-	void setupCommandList();
-	void swapBuffers();
+	void ThrowIfFailed1(HRESULT hr, const std::string& msg);
+	void ThrowIfFailed1(HRESULT hr);
+	void setupGeometry1();
+	void setupShaders1();
+	void setupDevice1();
+	void setupCommandQueue1();
+	void setupSwapChain1();
+	void setupDescriptorHeap1();
+	void setupRenderTargetView1();
+	void setupCommandAllocator1();
+	void setupCommandList1();
+	void swapBuffers1();
 
 	std::string readFile(const std::string& filename);
 
@@ -58,25 +58,23 @@ private:
 	Microsoft::WRL::ComPtr<ID3D12CommandAllocator> g_commandAllocator;
 	Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList> g_commandList;
 
-	Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> g_dsvHeap;
-	Microsoft::WRL::ComPtr<ID3D12Resource> g_depthStencil;
 
 	Microsoft::WRL::ComPtr<ID3D12Resource> g_renderTargets[BUFFER_COUNT];
 	UINT g_frameIndex;
 	UINT g_rtvDescriptorSize;
-	
+
 
 
 public:
 	const int Width{ 1280 };
 	const int Height{ 1024 };
 	GLFWwindow* window;
-	HWND GetWindowNativeHandler() const;
-	void setup();
-	void update();
-	void draw();
-	void clearColorBuffer(const float& r, const float& g, const float& b, const float& a);
-	void keyCallback(int key, int scancode, int action, int mods);
+	HWND GetWindowNativeHandler1() const;
+	void setup1();
+	void update1();
+	void draw1();
+	void clearColorBuffer1(const float& r, const float& g, const float& b, const float& a);
+	void keyCallback1(int key, int scancode, int action, int mods);
 
-	void setupDepthBuffer();
+	void setupDepthBuffer1();
 };

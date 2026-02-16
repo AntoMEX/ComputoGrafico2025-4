@@ -173,5 +173,4 @@ public:
     void cursorPositionCallback(GLFWwindow* window, double xpos, double ypos);
 
     void scrollCallback(GLFWwindow* window, double xoffset, double yoffset);
-
 };

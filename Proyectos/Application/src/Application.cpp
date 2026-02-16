@@ -97,7 +97,6 @@ void Application::keyCallback(int key, int scancode, int action, int mods)
 	{
 		dirX += 0.05f; 
 	}
-
 	if (key == GLFW_KEY_P && action == GLFW_PRESS) 
 	{
 		currentProgram = (currentProgram + 1) % 2; //Alternar entre pos de arreglo 0 y 1
